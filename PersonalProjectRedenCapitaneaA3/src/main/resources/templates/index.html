@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Springify</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<header>
+		<h1>Springify</h1>
+	</header>
+	<nav>
+		<div class="left-buttons">
+			<a th:if="${session.user == null}" th:text="${'Home'}" href="/">Home</a>
+			<a th:if="${session.user != null}" th:text="${'Browse'}" href="/browse">Browse</a>
+		</div>
+		<div class="right-buttons">
+			<a th:if="${session.user == null}" href="/register">Sign up</a>
+			<a th:if="${session.user == null}" href="/login">Login</a>
+			<a th:if="${session.user != null}" th:text="${'Library'}" href="/library">Library</a>
+			<a th:if="${session.user != null}" th:text="${'Logout (' + session.user.username + ')'}" href="/logout">Logout</a>
+		</div>
+	</nav>
+	<h2 th:text="${session.user != null ? 'Welcome back, ' + session.user.username + '!' : 'You must register/login to view'}"></h2>
+	<main>
+		<div id="error" class="error">
+			<span th:if="${session.userResult == 5}">Permission Denied</span>
+		</div>
+	</main>
+	<footer>
+		<address>&copy; 2024 Reden Capitanea</address>
+	</footer>
+</body>
+</html>

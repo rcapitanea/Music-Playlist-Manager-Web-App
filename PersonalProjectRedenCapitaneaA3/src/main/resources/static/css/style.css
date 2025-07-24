@@ -1,0 +1,149 @@
+@charset "UTF-8";
+
+header, footer {
+	background-color: #b3ecff;
+}
+
+header, footer, form {
+	border-radius: .2em;
+	margin: .5em .1em;
+	padding: .5em;
+}
+
+form {
+	border: .2em solid #96e6f2;
+}
+
+form>div {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 1.25em;
+}
+
+label {
+	font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+td {
+	max-width: 50px;
+    word-wrap: break-word;
+    white-space: normal; 
+    max-height: 100px;
+    overflow-y: auto; 
+}
+
+th {
+    background-color: #b3ecff;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+caption {
+	text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+    
+    th, td {
+        padding: 10px;
+        display: block;
+        text-align: right;
+    }
+
+    th::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+    }
+
+    td {
+    	max-width: 100%;
+        border: none;
+        border-bottom: 1px solid #ddd;
+    }
+}
+
+nav {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	position: relative;
+	background-color: #333;
+	overflow: hidden;	
+}
+
+nav a {
+	color: white;
+	text-decoration: none;
+	font-size: 20px;
+	padding: .9em 1em;
+}
+
+table a {
+	color: black;
+	text-decoration: none;
+}
+
+nav a:hover, table a:hover {
+	cursor: pointer;
+	background-color: grey;
+}
+
+input[type="submit"], button, .btn {
+	background-color: #b3ecff;
+	border: none;
+	border-radius: .32em;
+	height: 3em;
+	width: 100%;
+	cursor: pointer;
+}
+
+input[type="submit"]:hover, button:hover {
+	background-color: grey;
+}
+
+.error {
+	color: red;
+}
+
+.success {
+	color: green;
+}
+
+.left-buttons {
+	display: flex;
+	flex-grow: 1;
+}
+
+.right-buttons {
+	display: flex;
+}
+
+.action-box {
+	padding: 10px;
+	border: .2em solid grey;
+	flex-grow: 1;
+	flex-basis: 40%;
+}
+
+main {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}

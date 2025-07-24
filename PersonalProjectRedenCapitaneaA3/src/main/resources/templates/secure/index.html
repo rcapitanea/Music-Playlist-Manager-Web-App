@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Springify</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<header>
+		<h1>Springify</h1>
+	</header>
+	<nav>
+		<div class="left-buttons">
+			<a th:if="${session.user == null}" th:text="${'Home'}" href="/">Home</a>
+			<a th:if="${session.user != null}" th:text="${'Browse'}" href="/browse">Browse</a>
+		</div>
+		<div class="right-buttons">
+			<a th:if="${session.user == null}" href="/register">Sign up</a>
+			<a th:if="${session.user == null}" href="/login">Login</a>
+			<a th:if="${session.user != null}" th:text="${'Library'}" href="/library">Library</a>
+			<a th:if="${session.user != null}" th:text="${'Logout (' + session.user.username + ')'}" href="/logout">Logout</a>
+		</div>
+	</nav>
+	<h2 th:text="${session.user != null ? 'Welcome back, ' + session.user.username + '!' : 'You must register/login to view'}"></h2>
+	<main>
+		<div th:if="${session.user != null && session.playlists != null}" class="action-box">
+			<h2>Create new Playlist</h2>
+			<table th:if="${session.playlists.size() > 0}" border="1">
+			<caption>Your Playlists</caption>
+			<tr>
+				<th>Name</th><th>Description</th><th>Total Duration</th><th>Song Count</th><th>Actions</th>
+			</tr>
+			<tr th:each="p : ${session.playlists}">
+				<td th:text="${p.name}">Name</td>
+				<td th:text="${p.description}">Description</td>
+				<td th:text="${p.formattedPlaylistDuration}">0</td>
+				<td th:text="${p.songList != null ? p.songList.size() : 0}">Song Count</td>
+				<td>
+					<a th:href="@{/editPlaylist/}+${p.id}" class="btn">Edit</a>
+					<a th:href="@{/deletePlaylist/}+${p.id}" class="btn">Delete</a>
+					<a th:href="@{/viewPlaylist/}+${p.id}" class="btn">View</a>
+				</td>
+			</tr>
+			</table>
+			
+			<form th:if="${playlistObj == null}" method="post" action="" th:action="@{/createPlaylist}">
+				<div>
+					<label for="name">Playlist Name: </label>
+					<input type="text" name="name"/>
+				</div>
+				<div>
+					<label for="description">Description: </label>
+					<input type="text" name="description"/>
+				</div>
+				<input type="submit" value="Create new Playlist" />
+			</form>
+			<form th:if="${playlistObj != null}" method="post" action="" th:action="@{/editPlaylist}">
+				<input type="hidden" name="id" th:value="${playlistObj.id}"/>
+				<div>
+					<label for="name">Name: </label>
+					<input type="text" name="name" th:value="${playlistObj.name}"/>
+				</div>
+				
+				<div>
+					<label for="description">Description: </label>
+					<input type="text" name="description" th:value="${playlistObj.description}"/>
+				</div>
+				<input type="submit" value="Edit" />
+			</form>		
+		</div>
+		
+		<div th:if="${session.user != null && session.playlists != null && session.user.likedSongs != null}" class="action-box">
+			<h2>Liked Songs</h2>
+			<span th:if="${session.user.likedSongs.size() <= 0}">You currently have no liked songs.</span>
+			<table th:if="${session.user.likedSongs.size() > 0}" border="1">
+			<tr>
+				<th>Title</th><th>Artist</th><th>Album</th><th>Duration</th><th>Actions</th>
+			</tr>
+			<tr th:each="s : ${session.user.likedSongs}">
+				<td th:text="${s.title}">Title</td>
+				<td th:text="${s.artistName}">Artist</td>
+				<td th:text="${s.albumName != null ? s.albumName : s.title}">Album</td>
+				<td th:text="${s.formattedDuration}">Duration</td>
+				<td>
+					<a th:href="@{/addToPlaylist/}+${s.id}" class="btn">Add to Playlist</a>
+					<a th:href="@{/unlikeSongFromLib/}+${s.id}" class="btn">Unlike</a>
+				</td>
+			</tr>
+			</table>
+		</div>
+		
+		<div th:if="${session.user != null && session.otherPlaylists != null}" class="action-box">
+			<h2>Playlists made by Others</h2>
+			<table th:if="${session.otherPlaylists.size() > 0}" border="1">
+			<tr>
+				<th>Name</th><th>Description</th><th>Total Duration</th><th>Song Count</th><th>Creator</th><th>Actions</th><th sec:authorize="hasRole('ROLE_ADMIN')">Admin</th>
+			</tr>
+			<tr th:each="p : ${session.otherPlaylists}">
+				<td th:text="${p.name}">Name</td>
+				<td th:text="${p.description}">Description</td>
+				<td th:text="${p.formattedPlaylistDuration}">0</td>
+				<td th:text="${p.songList != null ? p.songList.size() : 0}">Song Count</td>
+				<td th:text="${p.creatorName}">Creator</td>
+				<td>
+					<a th:href="@{/viewPlaylist/}+${p.id}" class="btn">View</a>
+				</td>
+				<td sec:authorize="hasRole('ROLE_ADMIN')">
+					<a th:href="@{/adminDeletePlaylist/}+${p.id}" class="btn">Delete</a>
+				</td>
+			</tr>
+			</table>
+			<span th:if="${session.otherPlaylists.size() == 0}">There are currently no playlists.</span>
+		</div>
+		
+		<div th:if="${session.user != null && session.topHits != null}" class="action-box">
+			<h2>Todays Top Hits</h2>
+			<table th:if="${session.topHits.size() > 0}" border="1">
+			<tr>
+				<th>#</th><th>Title</th><th>Artist</th><th>Album</th><th>Duration</th><th>Actions</th><th sec:authorize="hasRole('ROLE_ADMIN')">Admin</th>
+			</tr>
+			<tr th:each="s : ${session.topHits}">
+				<td th:text="${s.rank}">Rank</td>
+				<td th:text="${s.title}">Title</td>
+				<td th:text="${s.artistName}">Artist</td>
+				<td th:text="${s.albumName != null ? s.albumName : s.title}">Album</td>
+				<td th:text="${s.formattedDuration}">Duration</td>
+				<td>
+					<a th:href="@{/addToPlaylist/}+${s.id}" class="btn">Add to Playlist</a>
+					<a th:href="@{/likeSong/}+${s.id}" th:text="${!session.user.checkSongLiked(s.id) ? 'Like' : ''}" class="btn"></a>
+					<a th:href="@{/unlikeSong/}+${s.id}" th:text="${session.user.checkSongLiked(s.id) ? 'Unlike' : ''}" class="btn"></a>
+				</td>
+				<td sec:authorize="hasRole('ROLE_ADMIN')">
+					<a th:href="@{/adminEditSong/}+${s.id}" class="btn">Edit</a>
+					<a th:href="@{/adminDeleteSong/}+${s.id}" class="btn">Delete</a>
+				</td>
+			</tr>
+			</table>
+			<form sec:authorize="hasRole('ROLE_ADMIN')" th:if="${session.adminSongObj != null}" method="post" action="" th:action="@{/adminEditSong}">
+				<input type="hidden" name="id" th:value="${session.adminSongObj.id}"/>
+				<div>
+					<label for="Title">Title: </label>
+					<input type="text" name="title" th:value="${session.adminSongObj.title}"/>
+				</div>
+				<div>
+					<label for="Title">Artist: </label>
+					<input type="text" name="artist" th:value="${session.adminSongObj.artistName}"/>
+				</div>
+				<div>
+					<label for="Title">Album</label>
+					<input type="text" name="album" th:value="${session.adminSongObj.albumName}"/>
+				</div>
+				
+				<div>
+					<label for="Title">Duration: </label>
+					<input type="number" name="duration" th:value="${session.adminSongObj.duration}"/>
+				</div>
+				
+				<input type="submit" value="Edit" />
+			</form>		
+		</div>
+		
+		
+		<div th:if="${session.user != null && session.song != null}" class="action-box">
+			<h2>Add a Song to Playlist</h2>
+			<p th:text="${'Song Title: ' + session.song.title}"></p>
+			<p th:text="${'Artist Name: ' + session.song.artistName}"></p>
+			<p th:text="${'Album Name: ' + (session.song.albumName != null ? session.song.albumName : session.song.title)}"></p>
+			<p th:text="${'Duration: ' + session.song.formattedDuration}"></p>
+			<form th:if="${session.playlists != null && session.playlists.size() > 0}" method="post" action="" th:action="@{/addToPlaylist}">
+				<label for="playlist">Choose a playlist:</label>
+				<select id="playlist" name="playlistId">
+					<option th:each="playlist : ${session.playlists}" th:value="${playlist.id}" th:text="${playlist.name}"></option>
+				</select>
+				<input type="submit" value="Add Song" />
+			</form>
+			<h3 th:if="${session.playlists != null && session.playlists.size() == 0}">You must create a playlist before you can add a new song!</h3>
+		</div>
+		
+		<div th:if="${session.user != null && session.selectedPlaylist != null}" class="action-box">
+			<table border="1">
+			<caption th:text="${session.selectedPlaylist.name}"></caption>
+			<tr>
+				<th>Title</th><th>Artist</th><th>Album</th><th>Duration</th><th>Actions</th>
+			</tr>
+			<tr th:each="s : ${session.selectedPlaylist.songList}">
+				<td th:text="${s.title}">Title</td>
+				<td th:text="${s.artistName}">Artist</td>
+				<td th:text="${s.albumName != null ? s.albumName : s.title}">Album</td>
+				<td th:text="${s.formattedDuration}">Duration</td>
+				<td>
+				<a th:text="${session.selectedPlaylist.creatorId == session.user.id ? 'Remove' : ''}" th:href="@{/removeFromPlaylist/}+${s.id}" class="btn"></a>
+				<a th:text="${session.selectedPlaylist.creatorId != session.user.id ? 'Add to Playlist' : ''}" th:href="@{/addToPlaylist/}+${s.id}" class="btn"></a>
+				</td>
+			</tr>
+			</table>
+		</div>
+	</main>
+	<footer>
+		<address>&copy; 2024 Reden Capitanea</address>
+	</footer>
+</body>
+</html>

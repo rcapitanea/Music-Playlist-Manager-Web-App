@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Springify</title>
+<script src="../static/js/script.js" th:src="@{/js/script.js}"></script>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<header>
+		<h1>Springify</h1>
+	</header>
+	<nav>
+		<div class="left-buttons">
+			<a th:if="${session.user == null}" th:text="${'Home'}" href="/">Home</a>
+			<a th:if="${session.user != null}" th:text="${'Browse'}" href="/browse">Browse</a>
+		</div>
+		<div class="right-buttons">
+			<a th:if="${session.user == null}" href="/register">Sign up</a>
+			<a th:if="${session.user == null}" href="/login">Login</a>
+			<a th:if="${session.user != null}" th:text="${'Library'}" href="/library">Library</a>
+			<a th:if="${session.user != null}" th:text="${'Logout (' + session.user.username + ')'}" href="/logout">Logout</a>
+		</div>
+	</nav>
+	<main>
+		<div class="action-box">
+			<div th:if="${session.userResult != null}" class="userResult">
+				<div id="success" class="success">
+					<span th:if="${session.userResult == 1}">Registration Successful!</span>	
+					<span th:if="${session.userResult == 3}">Login Successful!</span>
+				</div>
+				<div id="error" class="error">
+					<span th:if="${session.userResult == 2}">Username already exists.</span>
+					<span th:if="${session.userResult == 4}">Invalid username or password.</span>
+				</div>
+			</div>
+			<form th:if="${session.registration == 1}" name="regForm" action="#" method="post" onsubmit="return verify()" th:action="@{/register}" th:object="${user}">
+				<h2>Register New User</h2>
+				<input type="hidden" name="id" th:field="*{id}"/>
+				<div>
+					<label for="username">Username:</label> <input type="text"
+						id="username" name="username" />
+	
+				</div>
+	
+				<div>
+					<label for="password">Password:</label> <input type="password" id="password"
+						name="password" />
+				</div>
+				
+				<div>
+					<label for="verifyPassword">Verify Password:</label> <input type="password" id="verifyPassword"
+						name="verifyPassword" />
+				</div>
+	
+				<input type="submit" value="Register!" />
+			</form>
+			
+			<form th:if="${session.registration == 0}" method="post" th:action="@{/login}">
+				<h2>Login</h2>
+				<div th:if="${param.error}">
+					<div class="error">
+						Invalid credentials
+					</div>
+				</div>
+				<div th:if="${param.logout}">
+					<div class="success">
+						You have been logged out
+					</div>
+				</div>
+				<div>
+					<label for="username">Username:</label> <input type="text"
+						id="username" name="username" />
+				</div>
+				<div>
+					<label for="password">Password:</label> <input type="password" id="password"
+						name="password" />
+				</div>
+	
+				<input type="submit" value="Login!" name="login-submit" />
+			</form>
+		</div>
+		
+	</main>
+	<footer>
+		<address>&copy; 2024 Reden Capitanea</address>
+	</footer>
+</body>
+</html>
